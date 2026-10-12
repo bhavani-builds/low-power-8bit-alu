@@ -1,86 +1,123 @@
 
-# Low-Power 8-Bit ALU Design Using Verilog
+# Low-Power 8-Bit ALU Using Verilog HDL
 
-A Verilog RTL project implementing an 8-bit Arithmetic Logic Unit (ALU) with arithmetic, logical, shift, and comparison operations.
+## Overview
 
-> **Project status:** Functional RTL and testbench development. Low-power optimization and measurement are future work.
+This project implements an 8-bit Arithmetic Logic Unit (ALU)
+using Verilog HDL and explores operand isolation as a
+low-power design technique.
+
+The design includes a baseline ALU and an optimized ALU
+with operand isolation logic. Both versions are tested
+using identical input patterns.
 
 ## Features
 
-- 8-bit input operands
+- 8-bit arithmetic and logic operations
 - Addition and subtraction
 - AND, OR, XOR, and NOT operations
-- Logical left and right shifts
-- Unsigned comparison and equality detection
-- Zero flag and carry output
-- Self-checking Verilog testbench
+- Left and right shift operations
+- Unsigned comparison and equality checking
+- Zero and carry outputs
+- Operand isolation logic
+- Baseline-versus-optimized functional comparison
+- Switching activity experiment
 
-## Architecture
-
-The ALU accepts two 8-bit operands and a 4-bit opcode. Combinational logic selects the requested operation and produces an 8-bit result.
-
-## Opcode Table
+## Supported Operations
 
 | Opcode | Operation |
 |---|---|
-| `0000` | ADD |
-| `0001` | SUB |
-| `0010` | AND |
-| `0011` | OR |
-| `0100` | XOR |
-| `0101` | NOT A |
-| `0110` | Logical left shift |
-| `0111` | Logical right shift |
-| `1000` | Unsigned less-than |
-| `1001` | Equality |
+| 0000 | Addition |
+| 0001 | Subtraction |
+| 0010 | AND |
+| 0011 | OR |
+| 0100 | XOR |
+| 0101 | NOT A |
+| 0110 | Left shift |
+| 0111 | Right shift |
+| 1000 | Unsigned less-than |
+| 1001 | Equality |
 
 ## Project Structure
 
 ```text
 low-power-8bit-alu/
 ├── rtl/
-│   └── alu_8bit.v
+│   ├── alu_8bit.v
+│   ├── alu_8bit_baseline.v
+│   └── operand_isolation.v
 ├── testbench/
-│   └── tb_alu_8bit.v
+│   ├── tb_alu_8bit.v
+│   ├── tb_operand_isolation.v
+│   ├── tb_alu_activity.v
+│   ├── tb_alu_comparison.v
+│   └── tb_switching_activity.v
 ├── docs/
 │   └── architecture.md
+├── .gitignore
 └── README.md
 ```
 
+## Operand Isolation
+
+Operand isolation reduces unnecessary switching in a
+selected datapath by forcing an unused operand to zero.
+
+In this implementation, the B operand is isolated during
+the NOT-A operation. The isolation behavior is verified
+using a dedicated switching activity testbench.
+
+## Verification
+
+The testbenches cover:
+
+- ALU arithmetic and logic operations
+- Operand isolation behavior
+- Baseline and optimized output comparison
+- Switching activity on the operand path
+
 ## Simulation
 
-Install Icarus Verilog and run:
+Install Icarus Verilog and run commands from the project root.
+
+### Compare ALU outputs
 
 ```bash
-iverilog -g2012 -s tb_alu_8bit -o alu_test rtl/alu_8bit.v testbench/tb_alu_8bit.v
-vvp alu_test
+iverilog -g2012 -s tb_alu_comparison -o compare_test rtl/operand_isolation.v rtl/alu_8bit.v rtl/alu_8bit_baseline.v testbench/tb_alu_comparison.v
+vvp compare_test
 ```
 
-The testbench checks the implemented operations and status outputs.
+### Check switching activity
 
-## Low-Power Optimization Roadmap
+```bash
+iverilog -g2012 -s tb_switching_activity -o switching_test rtl/operand_isolation.v rtl/alu_8bit.v rtl/alu_8bit_baseline.v testbench/tb_switching_activity.v
+vvp switching_test
+```
 
-The current design is a functional baseline. Planned work includes:
+## Power Evaluation
 
-1. Establish baseline synthesis area and timing.
-2. Investigate operand isolation to reduce unnecessary switching.
-3. Compare baseline and optimized implementations.
-4. Evaluate switching activity and estimated dynamic power using appropriate tools.
+The switching activity experiment measures transitions
+on selected operand signals. It does not establish total
+power consumption or prove overall power savings.
 
-No power reduction is claimed until measurements support it.
+A complete power evaluation would require synthesis and
+appropriate power analysis under comparable constraints
+and workloads.
 
-## Skills Demonstrated
+## Future Improvements
+
+- Add clocked low-power datapath experiments
+- Evaluate synthesis area and timing
+- Compare switching activity across more operations
+- Use a supported ASIC or FPGA power-analysis flow
+
+## Tools
 
 - Verilog HDL
-- RTL design
-- Combinational logic
-- Functional verification
-- Digital design simulation
-- Synthesis and low-power design concepts
+- Icarus Verilog
+- GTKWave (optional)
+- Git and GitHub
 
-## Future Enhancements
+## Author
 
-- Add more corner-case tests.
-- Measure functional coverage.
-- Compare synthesis results before and after optimization.
-- Add simulation waveforms and results to the documentation.
+Digital Design and VLSI Learning Project
