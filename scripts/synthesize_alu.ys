@@ -1,0 +1,10 @@
+
+# Yosys synthesis script for the baseline ALU
+read_verilog rtl/alu_8bit_baseline.v
+hierarchy -check -top alu_8bit_baseline
+proc
+opt
+check
+synth -top alu_8bit_baseline
+stat
+write_verilog build/alu_baseline_synth.v
