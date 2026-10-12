@@ -8,7 +8,19 @@ module alu_8bit (
     output reg        carry
 );
 
+    wire [7:0] b_isolated;
+    wire use_operand_b;
+
     reg [8:0] temp;
+
+    // Operand B is not needed for NOT-A.
+    assign use_operand_b = (opcode != 4'b0101);
+
+    operand_isolation isolation_unit (
+        .b(b),
+        .enable_b(use_operand_b),
+        .b_isolated(b_isolated)
+    );
 
     always @(*) begin
         result = 8'b0;
@@ -17,24 +29,24 @@ module alu_8bit (
 
         case (opcode)
             4'b0000: begin
-                temp   = {1'b0, a} + {1'b0, b};
+                temp   = {1'b0, a} + {1'b0, b_isolated};
                 result = temp[7:0];
                 carry  = temp[8];
             end
 
             4'b0001: begin
-                result = a - b;
-                carry  = (a >= b);
+                result = a - b_isolated;
+                carry  = (a >= b_isolated);
             end
 
-            4'b0010: result = a & b;
-            4'b0011: result = a | b;
-            4'b0100: result = a ^ b;
+            4'b0010: result = a & b_isolated;
+            4'b0011: result = a | b_isolated;
+            4'b0100: result = a ^ b_isolated;
             4'b0101: result = ~a;
-            4'b0110: result = a << b[2:0];
-            4'b0111: result = a >> b[2:0];
-            4'b1000: result = (a < b) ? 8'd1 : 8'd0;
-            4'b1001: result = (a == b) ? 8'd1 : 8'd0;
+            4'b0110: result = a << b_isolated[2:0];
+            4'b0111: result = a >> b_isolated[2:0];
+            4'b1000: result = (a < b_isolated) ? 8'd1 : 8'd0;
+            4'b1001: result = (a == b_isolated) ? 8'd1 : 8'd0;
 
             default: result = 8'b0;
         endcase
