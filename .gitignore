@@ -1,0 +1,39 @@
+
+# Simulation executables
+alu_test
+*.out
+a.out
+
+# Waveform files
+*.vcd
+*.fst
+*.lxt
+*.lxt2
+
+# Simulator-generated files
+*.vvp
+*.log
+*.jou
+*.wlf
+
+# Synthesis and implementation outputs
+work/
+build/
+output/
+reports/
+results/
+*.edf
+*.edif
+*.bit
+*.bin
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*~
