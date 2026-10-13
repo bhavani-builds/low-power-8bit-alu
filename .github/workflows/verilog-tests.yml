@@ -1,0 +1,52 @@
+
+name: Verilog ALU Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  simulation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y iverilog
+
+      - name: Test ALU functionality
+        run: |
+          iverilog -g2012 -s tb_alu_8bit -o alu_test \
+            rtl/alu_8bit.v rtl/operand_isolation.v \
+            testbench/tb_alu_8bit.v
+          vvp alu_test
+
+      - name: Test operand isolation
+        run: |
+          iverilog -g2012 -s tb_operand_isolation -o isolation_test \
+            rtl/operand_isolation.v \
+            testbench/tb_operand_isolation.v
+          vvp isolation_test
+
+      - name: Compare baseline and optimized ALUs
+        run: |
+          iverilog -g2012 -s tb_alu_comparison -o compare_test \
+            rtl/alu_8bit_baseline.v rtl/alu_8bit.v \
+            rtl/operand_isolation.v \
+            testbench/tb_alu_comparison.v
+          vvp compare_test
+
+      - name: Test switching activity
+        run: |
+          iverilog -g2012 -s tb_switching_activity -o switching_test \
+            rtl/alu_8bit_baseline.v rtl/alu_8bit.v \
+            rtl/operand_isolation.v \
+            testbench/tb_switching_activity.v
+          vvp switching_test
